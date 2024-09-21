@@ -33,25 +33,32 @@ export const useMovieStore = create((set) => ({
 
       set({ movies: moviesWithFavorites })
     } catch (error) {
-      console.error('Error fetching the movie data:', error)
+      return { success: false, message: error }
     }
   },
-  toggleFavorite: (id) =>
-    set((state) => {
-      const updatedMovies = state.movies.map((movie) =>
-        movie.id === id ? { ...movie, isFavorite: !movie.isFavorite } : movie
-      )
+  toggleFavorite: (id) => {
+    try {
+      set((state) => {
+        const updatedMovies = state.movies.map((movie) =>
+          movie.id === id ? { ...movie, isFavorite: !movie.isFavorite } : movie
+        )
 
-      const favorites = JSON.parse(localStorage.getItem('favorites')) || {}
-      updatedMovies.forEach((movie) => {
-        if (movie.isFavorite) {
-          favorites[movie.id] = true
-        } else {
-          delete favorites[movie.id]
-        }
+        const favorites = JSON.parse(localStorage.getItem('favorites')) || {}
+        updatedMovies.forEach((movie) => {
+          if (movie.isFavorite) {
+            favorites[movie.id] = true
+          } else {
+            delete favorites[movie.id]
+          }
+        })
+        localStorage.setItem('favorites', JSON.stringify(favorites))
+
+        return { movies: updatedMovies }
       })
-      localStorage.setItem('favorites', JSON.stringify(favorites))
 
-      return { movies: updatedMovies }
-    })
+      return { success: true, message: 'Movie added to favorites' }
+    } catch (error) {
+      return { success: false, message: error }
+    }
+  }
 }))
