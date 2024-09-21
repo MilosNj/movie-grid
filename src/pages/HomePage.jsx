@@ -1,6 +1,7 @@
-import { useEffect } from 'react'
-import { useMovieStore } from '../store/movie.store'
 import { Container, SimpleGrid, Text, VStack } from '@chakra-ui/react'
+import { useEffect } from 'react'
+
+import { useMovieStore } from '../store/movie.store'
 
 const HomePage = () => {
   const { movies, fetchMovies } = useMovieStore()

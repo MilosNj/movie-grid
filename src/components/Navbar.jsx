@@ -8,7 +8,7 @@ import {
 } from '@chakra-ui/react'
 import { MdDarkMode, MdOutlineLightMode } from 'react-icons/md'
 
-const Header = () => {
+const Navbar = () => {
   const { colorMode, toggleColorMode } = useColorMode()
 
   return (
@@ -41,4 +41,4 @@ const Header = () => {
   )
 }
 
-export default Header
+export default Navbar
