@@ -21,10 +21,11 @@ const MovieCard = ({ movie }) => {
   const toast = useToast()
   const { toggleFavorite } = useMovieStore()
 
-  const formatDate = (dateString) => {
-    const [year, month, day] = dateString.split('-')
-    return `${day}.${month}.${year}.`
-  }
+  // const formatDate = (dateString) => {
+  //   console.log(dateString)
+  //   const [year, month, day] = dateString.split('-')
+  //   return `${day}.${month}.${year}.`
+  // }
 
   const handleToggleFavorite = (id) => {
     const { success, message } = toggleFavorite(id)
@@ -68,7 +69,7 @@ const MovieCard = ({ movie }) => {
         </Heading>
         <HStack justifyContent='space-between'>
           <Text color={textColor} mb={4}>
-            {formatDate(movie.release_date)}
+            {movie.release_date}
           </Text>
           <Button onClick={() => handleToggleFavorite(movie.id)}>
             {movie.isFavorite ? (

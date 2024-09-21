@@ -1,6 +1,7 @@
 import { Container, SimpleGrid, Text, VStack } from '@chakra-ui/react'
 import { useEffect } from 'react'
 
+import MovieCard from '../components/MovieCard'
 import { useMovieStore } from '../store/movie.store'
 
 const HomePage = () => {
@@ -23,12 +24,9 @@ const HomePage = () => {
           Current Movies
         </Text>
         <SimpleGrid columns={{ base: 1, md: 3, lg: 6 }} spacing={2} w='full'>
-          {/* {movies.map((movie) => (
-            <MovieCard
-              key={movie.id}
-              movie={movie}
-            />
-          ))} */}
+          {movies.map((movie) => (
+            <MovieCard key={movie.id} movie={movie} />
+          ))}
         </SimpleGrid>
         {movies.length === 0 && (
           <Text

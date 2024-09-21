@@ -5,7 +5,7 @@ export const useMovieStore = create((set) => ({
   setMovies: (movies) => set({ movies }),
   fetchMovies: async () => {
     try {
-      const res = await fetch('../assets/movies.json')
+      const res = await fetch('/movies.json')
       const data = await res.json()
       const favorites = JSON.parse(localStorage.getItem('favorites')) || {}
 
