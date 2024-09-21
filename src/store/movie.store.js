@@ -56,7 +56,7 @@ export const useMovieStore = create((set) => ({
         return { movies: updatedMovies }
       })
 
-      return { success: true, message: 'Movie added to favorites' }
+      return { success: true }
     } catch (error) {
       return { success: false, message: error }
     }
