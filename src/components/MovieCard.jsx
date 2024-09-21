@@ -91,9 +91,6 @@ const MovieCard = forwardRef(({ movie, onSelect }, ref) => {
           <Button
             onClick={() => handleToggleFavorite(movie.id)}
             variant='ghost'
-            bg='transparent'
-            _hover={{ bg: 'transparent' }}
-            _focus={{ boxShadow: 'none' }}
           >
             {movie.isFavorite ? (
               <FaStar fontSize={25} />
