@@ -1,4 +1,10 @@
-import { Container, SimpleGrid, Text, VStack } from '@chakra-ui/react'
+import {
+  Container,
+  SimpleGrid,
+  Text,
+  useColorModeValue,
+  VStack
+} from '@chakra-ui/react'
 import { useEffect, useRef, useState } from 'react'
 
 import MovieCard from '../components/MovieCard'
@@ -7,6 +13,10 @@ import { useMovieStore } from '../store/movie.store'
 const HomePage = () => {
   const { movies, fetchMovies } = useMovieStore()
   const [focusedIndex, setFocusedIndex] = useState(-1)
+  const focuxBoxShadow = useColorModeValue(
+    '0 0 0 3px rgba(66, 153, 225, 0.6)',
+    '0 0 0 3px rgba(173, 216, 230, 0.4)'
+  )
   const movieRefs = useRef([])
   const gridRef = useRef(null)
 
@@ -77,6 +87,10 @@ const HomePage = () => {
           onKeyDown={handleKeyDown}
           ref={gridRef}
           tabIndex={0}
+          _focus={{
+            outline: 'none',
+            boxShadow: focuxBoxShadow
+          }}
         >
           {movies.map((movie, index) => (
             <MovieCard
