@@ -6,8 +6,9 @@ import { useMovieStore } from '../store/movie.store'
 
 const HomePage = () => {
   const { movies, fetchMovies } = useMovieStore()
-  const [focusedIndex, setFocusedIndex] = useState(0)
+  const [focusedIndex, setFocusedIndex] = useState(-1)
   const movieRefs = useRef([])
+  const gridRef = useRef(null)
 
   const handleKeyDown = (e) => {
     let newIndex = focusedIndex
@@ -15,16 +16,23 @@ const HomePage = () => {
 
     switch (e.key) {
       case 'ArrowRight':
-        newIndex = (focusedIndex + 1) % movies.length
+        newIndex = focusedIndex === -1 ? 0 : (focusedIndex + 1) % movies.length
         break
       case 'ArrowLeft':
-        newIndex = (focusedIndex - 1 + movies.length) % movies.length
+        newIndex =
+          focusedIndex === -1
+            ? 0
+            : (focusedIndex - 1 + movies.length) % movies.length
         break
       case 'ArrowDown':
-        newIndex = (focusedIndex + columns) % movies.length
+        newIndex =
+          focusedIndex === -1 ? 0 : (focusedIndex + columns) % movies.length
         break
       case 'ArrowUp':
-        newIndex = (focusedIndex - columns + movies.length) % movies.length
+        newIndex =
+          focusedIndex === -1
+            ? 0
+            : (focusedIndex - columns + movies.length) % movies.length
         break
       default:
         return
@@ -39,7 +47,15 @@ const HomePage = () => {
   }, [fetchMovies])
 
   useEffect(() => {
-    if (movieRefs.current[focusedIndex]) movieRefs.current[focusedIndex].focus()
+    if (gridRef.current) {
+      gridRef.current.focus()
+    }
+  }, [])
+
+  useEffect(() => {
+    if (focusedIndex >= 0 && movieRefs.current[focusedIndex]) {
+      movieRefs.current[focusedIndex].focus()
+    }
   }, [focusedIndex])
 
   return (
@@ -59,6 +75,7 @@ const HomePage = () => {
           spacing={2}
           w='full'
           onKeyDown={handleKeyDown}
+          ref={gridRef}
           tabIndex={0}
         >
           {movies.map((movie, index) => (
