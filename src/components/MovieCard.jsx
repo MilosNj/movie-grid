@@ -66,6 +66,13 @@ const MovieCard = forwardRef(({ movie, onSelect }, ref) => {
       tabIndex={0}
       transition='all 0.3s'
       _hover={{ transform: 'scale(1.1)', zIndex: 10, shadow: 'xl' }}
+      _focus={{
+        transform: 'scale(1.1)',
+        zIndex: 10,
+        shadow: 'xl',
+        outline: 'none',
+        boxShadow: 'none'
+      }}
       onKeyDown={handleKeyDown}
       onFocus={onSelect}
     >
