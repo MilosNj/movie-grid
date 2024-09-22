@@ -28,33 +28,30 @@ const MovieCard = memo(
       return `${day}.${month}.${year}.`
     }
 
-    const handleToggleFavorite = useCallback(
-      (id) => {
-        const { success, message } = toggleFavorite(id)
-        if (!success) {
-          toast({
-            title: 'Error',
-            description: message,
-            status: 'error',
-            duration: 2000
-          })
-        } else {
-          toast({
-            title: 'Success',
-            description: `Movie ${
-              !movie.isFavorite ? 'added to' : 'removed from'
-            } favorites`,
-            status: 'success',
-            duration: 2000
-          })
-        }
-      },
-      [movie.isFavorite, toast, toggleFavorite]
-    )
+    const handleToggleFavorite = useCallback(() => {
+      const { success, message } = toggleFavorite(movie.id)
+      if (!success) {
+        toast({
+          title: 'Error',
+          description: message,
+          status: 'error',
+          duration: 2000
+        })
+      } else {
+        toast({
+          title: 'Success',
+          description: `Movie ${
+            !movie.isFavorite ? 'added to' : 'removed from'
+          } favorites`,
+          status: 'success',
+          duration: 2000
+        })
+      }
+    }, [movie.id, movie.isFavorite, toast, toggleFavorite])
 
     const handleKeyDown = (e) => {
       if (e.key === 'Enter') {
-        handleToggleFavorite(movie.id)
+        handleToggleFavorite()
       }
     }
 
@@ -91,11 +88,7 @@ const MovieCard = memo(
           </Heading>
           <HStack justifyContent='space-between'>
             <Text color={textColor}>{formatDate(movie.release_date)}</Text>
-            <Button
-              onClick={() => handleToggleFavorite(movie.id)}
-              variant='ghost'
-              p={0}
-            >
+            <Button onClick={handleToggleFavorite} variant='ghost' p={0}>
               {movie.isFavorite ? (
                 <FaStar fontSize={25} />
               ) : (
@@ -108,7 +101,8 @@ const MovieCard = memo(
     )
   }),
   (prevProps, nextProps) =>
-    prevProps.movie.isFavorite === nextProps.movie.isFavorite
+    prevProps.movie.isFavorite === nextProps.movie.isFavorite &&
+    prevProps.movie.id === nextProps.movie.id
 )
 
 MovieCard.displayName = 'MovieCard'
