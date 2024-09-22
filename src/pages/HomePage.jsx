@@ -5,12 +5,12 @@ import { FixedSizeGrid as Grid } from 'react-window'
 import MovieCard from '../components/MovieCard'
 import { useMovieStore } from '../store/movie.store'
 
-const COLUMN_WIDTH = 200
-const ROW_HEIGHT = 350
+const CELL_WIDTH = 200
+const CELL_HEIGHT = 350
 
 const HomePage = () => {
   const { movies, fetchMovies, toggleFavorite } = useMovieStore()
-  const [focusedIndex, setFocusedIndex] = useState(-1)
+  const [focusedIndex, setFocusedIndex] = useState(0)
   const gridRef = useRef(null)
   const outerRef = useRef(null)
 
@@ -28,7 +28,7 @@ const HomePage = () => {
     (e) => {
       if (!gridRef.current) return
 
-      const columns = Math.floor(gridRef.current.props.width / COLUMN_WIDTH)
+      const columns = Math.floor(gridRef.current.props.width / CELL_WIDTH)
       let newIndex = focusedIndex
 
       switch (e.key) {
@@ -68,7 +68,7 @@ const HomePage = () => {
   const Cell = useCallback(
     ({ columnIndex, rowIndex, style }) => {
       const width = gridRef.current ? gridRef.current.props.width : 0
-      const columns = Math.floor(width / COLUMN_WIDTH)
+      const columns = Math.floor(width / CELL_WIDTH)
       const index = rowIndex * columns + columnIndex
       const movie = movies[index]
 
@@ -113,13 +113,13 @@ const HomePage = () => {
             {({ height, width }) => (
               <Grid
                 ref={gridRef}
-                columnCount={Math.floor(width / COLUMN_WIDTH)}
-                columnWidth={COLUMN_WIDTH}
+                columnCount={Math.floor(width / CELL_WIDTH)}
+                columnWidth={CELL_WIDTH}
                 height={height}
                 rowCount={Math.ceil(
-                  movies.length / Math.floor(width / COLUMN_WIDTH)
+                  movies.length / Math.floor(width / CELL_WIDTH)
                 )}
-                rowHeight={ROW_HEIGHT}
+                rowHeight={CELL_HEIGHT}
                 width={width}
                 outerRef={outerRef}
               >
