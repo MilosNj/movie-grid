@@ -107,7 +107,7 @@ const HomePage = () => {
           onKeyDown={handleKeyDown}
           tabIndex={0}
           outline='none'
-          _focus={{ boxShadow: 'outline' }}
+          paddingLeft={6}
         >
           <AutoSizer>
             {({ height, width }) => (
