@@ -68,7 +68,7 @@ const HomePage = () => {
   }, [focusedIndex])
 
   return (
-    <Container maxW='container.xl' py={12}>
+    <Container maxW='container.xl'>
       <VStack spacing={8}>
         <Text
           fontSize='30'
