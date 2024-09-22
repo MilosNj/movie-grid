@@ -8,10 +8,9 @@ import {
   useColorModeValue,
   useToast
 } from '@chakra-ui/react'
-import { forwardRef, memo } from 'react'
+import { forwardRef, memo, useCallback } from 'react'
 import { CiStar } from 'react-icons/ci'
 import { FaStar } from 'react-icons/fa'
-
 import { useMovieStore } from '../store/movie.store'
 
 const MovieCard = memo(
@@ -21,7 +20,7 @@ const MovieCard = memo(
     const textColor = useColorModeValue('gray.600', 'gray.200')
     const bg = useColorModeValue('white', 'gray.800')
     const toast = useToast()
-    const { toggleFavorite } = useMovieStore()
+    const toggleFavorite = useMovieStore((state) => state.toggleFavorite)
 
     const formatDate = (dateString) => {
       if (!dateString) return ''
@@ -29,27 +28,29 @@ const MovieCard = memo(
       return `${day}.${month}.${year}.`
     }
 
-    const handleToggleFavorite = (id) => {
-      const { success, message } = toggleFavorite(id)
-
-      if (!success) {
-        toast({
-          title: 'Error',
-          description: message,
-          status: 'error',
-          duration: 2000
-        })
-      } else {
-        toast({
-          title: 'Success',
-          description: `Movie ${
-            !movie.isFavorite ? 'added to' : 'removed from'
-          } favorites`,
-          status: 'success',
-          duration: 2000
-        })
-      }
-    }
+    const handleToggleFavorite = useCallback(
+      (id) => {
+        const { success, message } = toggleFavorite(id)
+        if (!success) {
+          toast({
+            title: 'Error',
+            description: message,
+            status: 'error',
+            duration: 2000
+          })
+        } else {
+          toast({
+            title: 'Success',
+            description: `Movie ${
+              !movie.isFavorite ? 'added to' : 'removed from'
+            } favorites`,
+            status: 'success',
+            duration: 2000
+          })
+        }
+      },
+      [movie.isFavorite, toast, toggleFavorite]
+    )
 
     const handleKeyDown = (e) => {
       if (e.key === 'Enter') {
@@ -83,7 +84,7 @@ const MovieCard = memo(
           w='full'
           objectFit='fill'
         />
-        <Box p={4}>
+        <Box p={2}>
           <Heading as='h3' size='md' mb={2} isTruncated>
             {movie.title || movie.original_title}
           </Heading>
@@ -92,6 +93,7 @@ const MovieCard = memo(
             <Button
               onClick={() => handleToggleFavorite(movie.id)}
               variant='ghost'
+              p={0}
             >
               {movie.isFavorite ? (
                 <FaStar fontSize={25} />
