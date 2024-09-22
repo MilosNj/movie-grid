@@ -1,83 +1,96 @@
-import {
-  Container,
-  SimpleGrid,
-  Text,
-  useColorModeValue,
-  VStack
-} from '@chakra-ui/react'
+import { Box, Container, Text, VStack } from '@chakra-ui/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import AutoSizer from 'react-virtualized-auto-sizer'
+import { FixedSizeGrid as Grid } from 'react-window'
 import MovieCard from '../components/MovieCard'
 import { useMovieStore } from '../store/movie.store'
 
+const COLUMN_WIDTH = 200
+const ROW_HEIGHT = 350
+
 const HomePage = () => {
-  const { movies, fetchMovies } = useMovieStore()
+  const { movies, fetchMovies, toggleFavorite } = useMovieStore()
   const [focusedIndex, setFocusedIndex] = useState(-1)
-  const focusBoxShadow = useColorModeValue(
-    '0 0 0 3px rgba(66, 153, 225, 0.6)',
-    '0 0 0 3px rgba(173, 216, 230, 0.4)'
-  )
-  const movieRefs = useRef([])
   const gridRef = useRef(null)
-
-  const handleKeyDown = useCallback(
-    (e) => {
-      let newIndex = focusedIndex
-      const columns = 6
-
-      switch (e.key) {
-        case 'ArrowRight':
-          newIndex =
-            focusedIndex === -1 ? 0 : (focusedIndex + 1) % movies.length
-          break
-        case 'ArrowLeft':
-          newIndex =
-            focusedIndex === -1
-              ? 0
-              : (focusedIndex - 1 + movies.length) % movies.length
-          break
-        case 'ArrowDown':
-          newIndex =
-            focusedIndex === -1 ? 0 : (focusedIndex + columns) % movies.length
-          break
-        case 'ArrowUp':
-          newIndex =
-            focusedIndex === -1
-              ? 0
-              : (focusedIndex - columns + movies.length) % movies.length
-          break
-        default:
-          return
-      }
-
-      setFocusedIndex(newIndex)
-      e.preventDefault()
-    },
-    [focusedIndex, movies.length]
-  )
+  const outerRef = useRef(null)
 
   useEffect(() => {
     fetchMovies()
   }, [fetchMovies])
 
   useEffect(() => {
-    if (gridRef.current) {
-      gridRef.current.focus()
+    if (outerRef.current) {
+      outerRef.current.focus()
     }
   }, [])
 
-  useEffect(() => {
-    if (focusedIndex >= 0 && movieRefs.current[focusedIndex]) {
-      movieRefs.current[focusedIndex].focus()
-    }
-  }, [focusedIndex])
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (!gridRef.current) return
 
-  const handleSelect = useCallback((index) => {
-    setFocusedIndex(index)
-  }, [])
+      const columns = Math.floor(gridRef.current.props.width / COLUMN_WIDTH)
+      let newIndex = focusedIndex
+
+      switch (e.key) {
+        case 'ArrowRight':
+          newIndex = Math.min(focusedIndex + 1, movies.length - 1)
+          break
+        case 'ArrowLeft':
+          newIndex = Math.max(focusedIndex - 1, 0)
+          break
+        case 'ArrowDown':
+          newIndex = Math.min(focusedIndex + columns, movies.length - 1)
+          break
+        case 'ArrowUp':
+          newIndex = Math.max(focusedIndex - columns, 0)
+          break
+        case 'Enter':
+          if (focusedIndex >= 0 && focusedIndex < movies.length) {
+            toggleFavorite(movies[focusedIndex].id)
+          }
+          return
+        default:
+          return
+      }
+
+      if (newIndex !== focusedIndex) {
+        setFocusedIndex(newIndex)
+        gridRef.current.scrollToItem({
+          rowIndex: Math.floor(newIndex / columns),
+          columnIndex: newIndex % columns
+        })
+      }
+      e.preventDefault()
+    },
+    [focusedIndex, movies, toggleFavorite]
+  )
+
+  const Cell = useCallback(
+    ({ columnIndex, rowIndex, style }) => {
+      const width = gridRef.current ? gridRef.current.props.width : 0
+      const columns = Math.floor(width / COLUMN_WIDTH)
+      const index = rowIndex * columns + columnIndex
+      const movie = movies[index]
+
+      if (!movie) return null
+
+      return (
+        <Box style={style} padding={2}>
+          <MovieCard
+            movie={movie}
+            isSelected={focusedIndex === index}
+            onToggleFavorite={() => toggleFavorite(movie.id)}
+            onFocus={() => setFocusedIndex(index)}
+          />
+        </Box>
+      )
+    },
+    [movies, focusedIndex, toggleFavorite]
+  )
 
   return (
-    <Container maxW='container.xl'>
-      <VStack spacing={8}>
+    <Container maxW='container.xl' height='calc(100vh - 100px)'>
+      <VStack spacing={8} height='100%'>
         <Text
           fontSize='30'
           fontWeight='bold'
@@ -87,38 +100,34 @@ const HomePage = () => {
         >
           Current Movies
         </Text>
-        <SimpleGrid
-          columns={{ base: 1, md: 3, lg: 6 }}
-          spacing={2}
-          w='full'
+        <Box
+          ref={outerRef}
+          flex={1}
+          width='100%'
           onKeyDown={handleKeyDown}
-          ref={gridRef}
           tabIndex={0}
-          _focus={{
-            outline: 'none',
-            boxShadow: focusBoxShadow
-          }}
+          outline='none'
+          _focus={{ boxShadow: 'outline' }}
         >
-          {movies.map((movie, index) => (
-            <MovieCard
-              key={movie.id}
-              movie={movie}
-              onSelect={() => handleSelect(index)}
-              isSelected={focusedIndex === index}
-              ref={(el) => (movieRefs.current[index] = el)}
-            />
-          ))}
-        </SimpleGrid>
-        {movies.length === 0 && (
-          <Text
-            fontSize='xl'
-            textAlign='center'
-            fontWeight='bold'
-            color='gray.500'
-          >
-            No movies found
-          </Text>
-        )}
+          <AutoSizer>
+            {({ height, width }) => (
+              <Grid
+                ref={gridRef}
+                columnCount={Math.floor(width / COLUMN_WIDTH)}
+                columnWidth={COLUMN_WIDTH}
+                height={height}
+                rowCount={Math.ceil(
+                  movies.length / Math.floor(width / COLUMN_WIDTH)
+                )}
+                rowHeight={ROW_HEIGHT}
+                width={width}
+                outerRef={outerRef}
+              >
+                {Cell}
+              </Grid>
+            )}
+          </AutoSizer>
+        </Box>
       </VStack>
     </Container>
   )
