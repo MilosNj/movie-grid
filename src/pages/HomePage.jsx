@@ -6,7 +6,6 @@ import {
   VStack
 } from '@chakra-ui/react'
 import { useEffect, useRef, useState } from 'react'
-
 import MovieCard from '../components/MovieCard'
 import { useMovieStore } from '../store/movie.store'
 

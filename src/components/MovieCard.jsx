@@ -68,11 +68,12 @@ const MovieCard = memo(
         tabIndex={0}
         transition='all 0.3s'
         _focus={{
-          transform: 'scale(1.1)',
+          transform: 'scale(1.11)',
           zIndex: 10,
           shadow: 'xl',
           outline: 'none',
-          boxShadow: 'none'
+          boxShadow: 'none',
+          bg: useColorModeValue('blue.100', 'gray.500')
         }}
         onKeyDown={handleKeyDown}
         onFocus={onSelect}
