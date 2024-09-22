@@ -5,51 +5,55 @@ import {
   useColorModeValue,
   VStack
 } from '@chakra-ui/react'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import MovieCard from '../components/MovieCard'
 import { useMovieStore } from '../store/movie.store'
 
 const HomePage = () => {
   const { movies, fetchMovies } = useMovieStore()
   const [focusedIndex, setFocusedIndex] = useState(-1)
-  const focuxBoxShadow = useColorModeValue(
+  const focusBoxShadow = useColorModeValue(
     '0 0 0 3px rgba(66, 153, 225, 0.6)',
     '0 0 0 3px rgba(173, 216, 230, 0.4)'
   )
   const movieRefs = useRef([])
   const gridRef = useRef(null)
 
-  const handleKeyDown = (e) => {
-    let newIndex = focusedIndex
-    const columns = 6
+  const handleKeyDown = useCallback(
+    (e) => {
+      let newIndex = focusedIndex
+      const columns = 6
 
-    switch (e.key) {
-      case 'ArrowRight':
-        newIndex = focusedIndex === -1 ? 0 : (focusedIndex + 1) % movies.length
-        break
-      case 'ArrowLeft':
-        newIndex =
-          focusedIndex === -1
-            ? 0
-            : (focusedIndex - 1 + movies.length) % movies.length
-        break
-      case 'ArrowDown':
-        newIndex =
-          focusedIndex === -1 ? 0 : (focusedIndex + columns) % movies.length
-        break
-      case 'ArrowUp':
-        newIndex =
-          focusedIndex === -1
-            ? 0
-            : (focusedIndex - columns + movies.length) % movies.length
-        break
-      default:
-        return
-    }
+      switch (e.key) {
+        case 'ArrowRight':
+          newIndex =
+            focusedIndex === -1 ? 0 : (focusedIndex + 1) % movies.length
+          break
+        case 'ArrowLeft':
+          newIndex =
+            focusedIndex === -1
+              ? 0
+              : (focusedIndex - 1 + movies.length) % movies.length
+          break
+        case 'ArrowDown':
+          newIndex =
+            focusedIndex === -1 ? 0 : (focusedIndex + columns) % movies.length
+          break
+        case 'ArrowUp':
+          newIndex =
+            focusedIndex === -1
+              ? 0
+              : (focusedIndex - columns + movies.length) % movies.length
+          break
+        default:
+          return
+      }
 
-    setFocusedIndex(newIndex)
-    e.preventDefault()
-  }
+      setFocusedIndex(newIndex)
+      e.preventDefault()
+    },
+    [focusedIndex, movies.length]
+  )
 
   useEffect(() => {
     fetchMovies()
@@ -66,6 +70,10 @@ const HomePage = () => {
       movieRefs.current[focusedIndex].focus()
     }
   }, [focusedIndex])
+
+  const handleSelect = useCallback((index) => {
+    setFocusedIndex(index)
+  }, [])
 
   return (
     <Container maxW='container.xl'>
@@ -88,14 +96,14 @@ const HomePage = () => {
           tabIndex={0}
           _focus={{
             outline: 'none',
-            boxShadow: focuxBoxShadow
+            boxShadow: focusBoxShadow
           }}
         >
           {movies.map((movie, index) => (
             <MovieCard
               key={movie.id}
               movie={movie}
-              onSelect={() => setFocusedIndex(index)}
+              onSelect={() => handleSelect(index)}
               isSelected={focusedIndex === index}
               ref={(el) => (movieRefs.current[index] = el)}
             />
